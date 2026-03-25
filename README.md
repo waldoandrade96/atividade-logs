@@ -1,146 +1,126 @@
-# Benchmark de Paralelismo com Multiprocessing em Python
+# Relatório de Benchmark: Processamento Paralelo de Logs em Python
 
 **Disciplina:** Programação Concorrente e Distribuída  
-**Aluno:** Lucas Vasconcelos Pessoa de Oliveira  
+**Estudante:** Lucas Vasconcelos Pessoa de Oliveira  
 **Turma:** ADSN04  
-**Professor:** Rafael  
+**Docente:** Rafael  
 **Data:** 18/03/2026  
 
 ---
 
-## 1. Descrição do Problema
+## 1. Escopo do Projeto
 
-O programa foi feito pra processar **1.000 arquivos de log** em paralelo, dividindo o trabalho entre vários processos ao mesmo tempo pra ver se fica mais rápido.
+O objetivo principal deste código é realizar o processamento simultâneo de 1.000 arquivos de log, distribuindo a carga de trabalho entre múltiplos processos para avaliar o ganho real de velocidade.
 
-Cada arquivo é lido e processado individualmente: o programa conta o total de linhas, palavras e caracteres, além de fazer uma contagem de palavras-chave específicas (`erro`, `warning`, `info`). No final, todos os resultados são consolidados.
+A rotina analisa cada documento separadamente. O algoritmo contabiliza a quantidade total de linhas, palavras e caracteres. Além disso, faz a busca e a contagem de termos específicos (como `erro`, `warning` e `info`), consolidando todos os dados em um relatório final único.
 
-| Pergunta | Resposta |
-|----------|----------|
-| Objetivo | Processar 1.000 arquivos de log em paralelo e comparar os tempos |
-| Volume de dados | 1.000 arquivos — 10.000.000 linhas / 200.000.000 palavras / ~1,37 GB de caracteres |
-| Algoritmo | Distribuição dos arquivos entre processos com `multiprocessing.Pool.map()` |
-| Complexidade | O(n/p) — quanto mais processos, menos arquivos por processo |
-
----
-
-## 2. Ambiente Experimental
-
-| Item | Descrição |
-|------|-----------|
-| Processador | Intel Core i5-12500 (12ª Geração) — 3.00 GHz |
-| Número de núcleos | 6 núcleos físicos / 12 threads lógicas |
-| Memória RAM | 16,0 GB |
-| Sistema Operacional | Windows 11 |
-| Linguagem utilizada | Python 3.x |
-| Biblioteca de paralelização | `multiprocessing` (já vem com o Python) |
-| Compilador / Versão | CPython — Python 3.x |
+| Característica | Detalhe |
+|---|---|
+| **Propósito** | Medir e comparar tempos ao processar 1.000 arquivos de log de forma simultânea. |
+| **Volume de Dados** | 1.000 documentos, totalizando 10 milhões de linhas, 200 milhões de palavras e aproximadamente 1,37 GB de texto. |
+| **Estratégia** | Divisão das tarefas através do método `multiprocessing.Pool.map()`. |
+| **Complexidade** | O(n/p), indicando que a quantidade de arquivos atribuída a cada processo diminui à medida que mais processos são alocados. |
 
 ---
 
-## 3. Metodologia de Testes
+## 2. Hardware e Ambiente de Testes
 
-O tempo foi medido usando `time.perf_counter()`, que é bem preciso. Só foi contado o tempo do processamento em si, sem contar o tempo de leitura do arquivo.
+Os testes foram conduzidos na seguinte máquina:
 
-Cada configuração foi rodada **3 vezes** e o tempo usado foi a **média** das 3 execuções, pra evitar que alguma variação aleatória do sistema distorcesse o resultado.
-
-### Configurações testadas
-
-- 1 processo
-- 2 processos
-- 4 processos
-- 8 processos
-- 12 processos
+* **Processador:** Intel Core i5-12500 (12ª Geração) operando a 3.00 GHz
+* **Estrutura da CPU:** 6 núcleos físicos e 12 threads lógicas
+* **Memória RAM:** 16,0 GB
+* **Sistema Operacional:** Windows 11
+* **Linguagem e Compilador:** Python 3.x (CPython)
+* **Biblioteca:** `multiprocessing` (ferramenta nativa do Python)
 
 ---
 
-## 4. Resultados Experimentais
+## 3. Metodologia de Medição
+
+Para garantir uma precisão alta, o tempo foi cronometrado com a função `time.perf_counter()`. O foco foi isolar apenas o tempo de processamento, desconsiderando a etapa de leitura inicial dos arquivos.
+
+Para evitar que anomalias ou picos de uso do sistema operacional afetassem os dados, cada cenário de teste foi repetido 3 vezes, adotando-se a média de tempo dessas execuções.
+
+**Cenários Avaliados:**
+* 1 processo
+* 2 processos
+* 4 processos
+* 8 processos
+* 12 processos
+
+---
+
+## 4. Tempos Obtidos e Dados Consolidados
+
+**Tempos médios por configuração:**
 
 | Nº Processos | Tempo de Execução (s) |
-|:------------:|:---------------------:|
-| 1            | 83.7459               |
-| 2            | 46.2264               |
-| 4            | 26.9465               |
-| 8            | 13.8504               |
-| 12           | 13.0065               |
+|:---:|:---:|
+| 1 | 83.7459 |
+| 2 | 46.2264 |
+| 4 | 26.9465 |
+| 8 | 13.8504 |
+| 12 | 13.0065 |
 
-**Resultado consolidado (igual em todas as execuções):**
+**Resultados exatos do conteúdo analisado (consistentes em todas as rodadas):**
 
-| Métrica | Valor |
-|---------|-------|
-| Arquivos processados | 1.000 |
-| Total de linhas | 10.000.000 |
-| Total de palavras | 200.000.000 |
-| Total de caracteres | 1.366.663.305 |
-| Ocorrências de `erro` | 33.332.083 |
-| Ocorrências de `warning` | 33.330.520 |
-| Ocorrências de `info` | 33.329.065 |
+* O script processou com sucesso 1.000 arquivos.
+* Foram contadas 10.000.000 de linhas.
+* O total de palavras lidas foi de 200.000.000.
+* Foram identificados 1.366.663.305 caracteres no total.
+* A palavra-chave `erro` apareceu 33.332.083 vezes.
+* A palavra-chave `warning` apareceu 33.330.520 vezes.
+* A palavra-chave `info` apareceu 33.329.065 vezes.
 
 ---
 
-## 5. Cálculo de Speedup e Eficiência
+## 5. Fórmulas de Desempenho (Speedup e Eficiência)
 
-O **speedup** mostra quantas vezes ficou mais rápido em relação ao tempo sem paralelismo:
+* **Speedup:** Mede o fator de aceleração dividindo o tempo da execução sequencial original pelo tempo da execução paralela com múltiplos processos.
+  Speedup(p) = T(1) / T(p)
 
-```
-Speedup(p) = T(1) / T(p)
-```
-
-A **eficiência** mostra se os processos estão sendo bem aproveitados (1,0 seria o ideal):
-
-```
-Eficiência(p) = Speedup(p) / p
-```
+* **Eficiência:** Avalia se o hardware está sendo bem aproveitado dividindo o valor do Speedup pela quantidade de processos, onde 1,0 representa a eficiência perfeita.
+  Eficiência(p) = Speedup(p) / p
 
 ---
 
-## 6. Tabela de Resultados
+## 6. Quadro Comparativo de Métricas
 
-| Processos | Tempo (s) | Speedup | Eficiência |
-|:---------:|:---------:|:-------:|:----------:|
-| 1         | 83.7459   | 1.00    | 1.00       |
-| 2         | 46.2264   | 1.81    | 0.91       |
-| 4         | 26.9465   | 3.11    | 0.78       |
-| 8         | 13.8504   | 6.05    | 0.76       |
-| 12        | 13.0065   | 6.44    | 0.54       |
+| Processos | Tempo (s) | Aceleração (Speedup) | Eficiência |
+|:---:|:---:|:---:|:---:|
+| 1 | 83.7459 | 1.00 | 1.00 |
+| 2 | 46.2264 | 1.81 | 0.91 |
+| 4 | 26.9465 | 3.11 | 0.78 |
+| 8 | 13.8504 | 6.05 | 0.76 |
+| 12 | 13.0065 | 6.44 | 0.54 |
 
-> ✅ **Melhor resultado: 12 processos (13.0065s)**
-
----
-
-## 7. Gráfico de Tempo de Execução
-
-![Gráfico Tempo Execução](tempo.execucao.png)
+> ✅ **Melhor resultado da bateria de testes:** A execução mais rápida ocorreu com 12 processos, finalizando a rotina em **13.0065 segundos**.
 
 ---
 
-## 8. Gráfico de Speedup
+## 7. Gráficos Relacionados
 
-![Gráfico Speedup](speedup.png)
-
----
-
-## 9. Gráfico de Eficiência
-
-![Gráfico Eficiência](eficiencia.png)
+* **Gráfico de Tempo de Execução:** `tempo.execucao.png`
+* **Gráfico de Evolução do Speedup:** `speedup.png`
+* **Gráfico da Curva de Eficiência:** `eficiencia.png`
 
 ---
 
-## 10. Análise dos Resultados
+## 8. Discussão e Análise
 
-Diferente de um benchmark de operações matemáticas simples, o processamento de arquivos é uma tarefa com maior custo de I/O e CPU por unidade de trabalho. Isso faz com que o paralelismo seja muito mais eficaz aqui.
+Ao contrário de simulações com matemática simples, processar arquivos de texto exige uma carga pesada tanto da CPU quanto de entrada/saída (I/O). Por conta dessa característica, aplicar paralelismo apresenta um impacto bastante positivo e notável.
 
-De 1 pra 2 processos o ganho foi expressivo (1.81x), e a melhora continuou de forma consistente até 8 processos (6.05x). Com 12 processos o ganho adicional foi pequeno — de 13.85s pra 13.01s — o que indica que o sistema começa a atingir o limite de saturação dos recursos físicos disponíveis (6 núcleos físicos / 12 threads).
+O salto de 1 para 2 processos reduziu o tempo drasticamente, entregando um ganho de desempenho de 1.81x. Essa melhora continuou escalando progressivamente até a marca de 8 processos, atingindo um speedup de 6.05x. Contudo, ao adicionar 12 processos, a redução de tempo foi bem menor (caindo apenas de 13.85s para 13.01s). Isso evidencia que a arquitetura atingiu o teto dos recursos físicos disponíveis no sistema (6 núcleos e 12 threads).
 
-A eficiência se manteve alta até 8 processos (0.76), caindo para 0.54 com 12 processos. Isso é esperado: com mais processos do que núcleos físicos, o ganho marginal diminui por conta da contenção de I/O e do overhead de gerenciamento dos processos.
+A métrica de eficiência permaneceu sólida e útil até 8 processos (0.76). No entanto, despencou para 0.54 com a carga de 12 processos. Esse declínio é o comportamento esperado: quando o número de processos ultrapassa os núcleos físicos, o custo extra de administrar as threads simultâneas e a disputa pela leitura do disco acabam diminuindo o ganho marginal.
 
-No geral, o paralelismo se mostrou muito mais vantajoso nesse cenário do que em benchmarks de operações puramente matemáticas, já que o custo real de processar cada arquivo justifica o overhead de criar e coordenar os processos.
-
----
-
-## 11. Conclusão
-
-O paralelismo com `multiprocessing` funcionou muito bem para o processamento de arquivos de log. O melhor resultado foi com **12 processos**, que foi **6.44x mais rápido** que a execução sequencial.
-
-Ao contrário de tarefas simples como somar números, o processamento de arquivos tem um custo computacional maior por unidade de trabalho — leitura de disco, parsing de texto e contagem de palavras-chave — o que justifica bem o uso de múltiplos processos e resulta em ganhos expressivos de desempenho.
+Em resumo, a paralelização se provou muito mais eficiente para essa tarefa do que para algoritmos matemáticos básicos, porque o custo de varrer e extrair dados de cada log compensa todo o trabalho do sistema operacional de criar e organizar múltiplos processos.
 
 ---
+
+## 9. Considerações Finais
+
+O módulo `multiprocessing` demonstrou excelente aderência ao problema de leitura massiva de arquivos de log. A estratégia mais eficiente nos testes usou 12 processos, executando o trabalho **6.44 vezes mais rápido** em comparação à abordagem tradicional (1 processo).
+
+Ao contrário de operações rápidas, a carga computacional alta para fazer parseamento de texto e busca de dicionários justifica perfeitamente o esforço de paralelização, resultando em ganhos diretos e expressivos na agilidade do programa.
