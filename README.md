@@ -1,7 +1,7 @@
 # Relatório de Benchmark: Processamento Paralelo de Logs em Python
 
 **Disciplina:** Programação Concorrente e Distribuída  
-**Estudante:** Lucas Vasconcelos Pessoa de Oliveira  
+**Estudante:** Waldo  
 **Turma:** ADSN04  
 **Docente:** Rafael  
 **Data:** 18/03/2026  
