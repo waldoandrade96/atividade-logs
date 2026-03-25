@@ -3,8 +3,8 @@
 **Disciplina:** Programação Concorrente e Distribuída  
 **Estudante:** Waldo Andrade Silva
 **Turma:** ADSN04  
-**Docente:** Rafael  
-**Data:** 18/03/2026  
+**Professor:** Rafael  
+**Data:** 25/03/2026  
 
 ---
 
@@ -59,7 +59,7 @@ Para evitar que anomalias ou picos de uso do sistema operacional afetassem os da
 | 1 | 83.7459 |
 | 2 | 46.2264 |
 | 4 | 26.9465 |
-| 8 | 13.8504 |
+| 8 | 14.8504 |
 | 12 | 13.0065 |
 
 **Resultados exatos do conteúdo analisado (consistentes em todas as rodadas):**
@@ -91,33 +91,42 @@ Para evitar que anomalias ou picos de uso do sistema operacional afetassem os da
 | 1 | 83.7459 | 1.00 | 1.00 |
 | 2 | 46.2264 | 1.81 | 0.91 |
 | 4 | 26.9465 | 3.11 | 0.78 |
-| 8 | 13.8504 | 6.05 | 0.76 |
+| 8 | 14.8504 | 6.05 | 0.76 |
 | 12 | 13.0065 | 6.44 | 0.54 |
 
-> ✅ **Melhor resultado da bateria de testes:** A execução mais rápida ocorreu com 12 processos, finalizando a rotina em **13.0065 segundos**.
 
 ---
 
-## 7. Gráficos Relacionados
+## 7. Gráfico de Tempo de Execução
 
-* **Gráfico de Tempo de Execução:** `tempo.execucao.png`
-* **Gráfico de Evolução do Speedup:** `speedup.png`
-* **Gráfico da Curva de Eficiência:** `eficiencia.png`
+![Gráfico Tempo Execução](tempo.execucao.png)
 
 ---
 
-## 8. Discussão e Análise
+## 8. Gráfico de Speedup
+
+![Gráfico Speedup](speedup.png)
+
+---
+
+## 9. Gráfico de Eficiência
+
+![Gráfico Eficiência](eficiencia.png)
+
+---
+
+## 10. Discussão e Análise
 
 Ao contrário de simulações com matemática simples, processar arquivos de texto exige uma carga pesada tanto da CPU quanto de entrada/saída (I/O). Por conta dessa característica, aplicar paralelismo apresenta um impacto bastante positivo e notável.
 
-O salto de 1 para 2 processos reduziu o tempo drasticamente, entregando um ganho de desempenho de 1.81x. Essa melhora continuou escalando progressivamente até a marca de 8 processos, atingindo um speedup de 6.05x. Contudo, ao adicionar 12 processos, a redução de tempo foi bem menor (caindo apenas de 13.85s para 13.01s). Isso evidencia que a arquitetura atingiu o teto dos recursos físicos disponíveis no sistema (6 núcleos e 12 threads).
+O salto de 1 para 2 processos reduziu o tempo drasticamente, entregando um ganho de desempenho de 1.81x. Essa melhora continuou escalando progressivamente até a marca de 8 processos, atingindo um speedup de 6.05x. Contudo, ao adicionar 12 processos, a redução de tempo foi bem menor (caindo apenas de 14.85s para 13.01s). Isso evidencia que a arquitetura atingiu o teto dos recursos físicos disponíveis no sistema (6 núcleos e 12 threads).
 
 A métrica de eficiência permaneceu sólida e útil até 8 processos (0.76). No entanto, despencou para 0.54 com a carga de 12 processos. Esse declínio é o comportamento esperado: quando o número de processos ultrapassa os núcleos físicos, o custo extra de administrar as threads simultâneas e a disputa pela leitura do disco acabam diminuindo o ganho.
 
 
 ---
 
-## 9. Conclusão Final e Análise Crítica
+## 11. Conclusão Final e Análise Crítica
 
 A experimentação realizada com o módulo `multiprocessing` permitiu validar, de forma prática, os benefícios e as limitações do paralelismo em tarefas de processamento intensivo de dados.
 
@@ -126,7 +135,5 @@ A experimentação realizada com o módulo `multiprocessing` permitiu validar, d
    
 2. **Impacto do I/O e CPU:** Diferente de cálculos puramente matemáticos, o processamento de logs envolve uma carga mista de leitura de disco (I/O) e análise de strings (CPU). O paralelismo mostrou-se altamente eficaz aqui porque, enquanto um processo aguarda a leitura de um ficheiro, outros podem continuar a processar dados já carregados na memória.
 
-3. **Ponto de Diminuição de Retorno (Law of Diminishing Returns):** Observou-se que a eficiência caiu de **0.76 (8 processos)** para **0.54 (12 processos)**. Este fenómeno ocorre porque o processador utilizado possui 6 núcleos físicos. Ao utilizar 12 processos (o limite das threads lógicas), o ganho marginal de tempo torna-se menor devido ao *overhead* de gestão do Sistema Operativo e à disputa pelos recursos de hardware (cache e barramento de memória).
+3. **Ponto de Diminuição de Retorno:** Observou-se que a eficiência caiu de **0.76 (8 processos)** para **0.54 (12 processos)**. Este fenómeno ocorre porque o processador utilizado possui 6 núcleos físicos. Ao utilizar 12 processos (o limite das threads lógicas), o ganho marginal de tempo torna-se menor devido ao *overhead* de gestão do Sistema Operativo e à disputa pelos recursos de hardware (cache e barramento de memória).
 
-### Veredito:
-O uso de múltiplas instâncias de processamento é a estratégia ideal para este cenário. Para volumes de dados na escala de Gigabytes, como o testado (1.37 GB), a abordagem paralela não é apenas uma otimização, mas uma necessidade para garantir a viabilidade temporal da aplicação. O projeto demonstra com sucesso que, ao alinhar a arquitetura do software com as capacidades do hardware moderno, é possível transformar tarefas demoradas em processos de execução quase instantânea.
