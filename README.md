@@ -1,7 +1,7 @@
 # Relatório de Benchmark: Processamento Paralelo de Logs em Python
 
 **Disciplina:** Programação Concorrente e Distribuída  
-**Estudante:** Waldo  
+**Estudante:** Waldo Andrade Silva
 **Turma:** ADSN04  
 **Docente:** Rafael  
 **Data:** 18/03/2026  
@@ -18,7 +18,6 @@ A rotina analisa cada documento separadamente. O algoritmo contabiliza a quantid
 |---|---|
 | **Propósito** | Medir e comparar tempos ao processar 1.000 arquivos de log de forma simultânea. |
 | **Volume de Dados** | 1.000 documentos, totalizando 10 milhões de linhas, 200 milhões de palavras e aproximadamente 1,37 GB de texto. |
-| **Estratégia** | Divisão das tarefas através do método `multiprocessing.Pool.map()`. |
 | **Complexidade** | O(n/p), indicando que a quantidade de arquivos atribuída a cada processo diminui à medida que mais processos são alocados. |
 
 ---
@@ -31,8 +30,8 @@ Os testes foram conduzidos na seguinte máquina:
 * **Estrutura da CPU:** 6 núcleos físicos e 12 threads lógicas
 * **Memória RAM:** 16,0 GB
 * **Sistema Operacional:** Windows 11
-* **Linguagem e Compilador:** Python 3.x (CPython)
-* **Biblioteca:** `multiprocessing` (ferramenta nativa do Python)
+* **Linguagem e Compilador:** Python 3.x
+* **Biblioteca:** `multiprocessing`
 
 ---
 
@@ -113,14 +112,21 @@ Ao contrário de simulações com matemática simples, processar arquivos de tex
 
 O salto de 1 para 2 processos reduziu o tempo drasticamente, entregando um ganho de desempenho de 1.81x. Essa melhora continuou escalando progressivamente até a marca de 8 processos, atingindo um speedup de 6.05x. Contudo, ao adicionar 12 processos, a redução de tempo foi bem menor (caindo apenas de 13.85s para 13.01s). Isso evidencia que a arquitetura atingiu o teto dos recursos físicos disponíveis no sistema (6 núcleos e 12 threads).
 
-A métrica de eficiência permaneceu sólida e útil até 8 processos (0.76). No entanto, despencou para 0.54 com a carga de 12 processos. Esse declínio é o comportamento esperado: quando o número de processos ultrapassa os núcleos físicos, o custo extra de administrar as threads simultâneas e a disputa pela leitura do disco acabam diminuindo o ganho marginal.
+A métrica de eficiência permaneceu sólida e útil até 8 processos (0.76). No entanto, despencou para 0.54 com a carga de 12 processos. Esse declínio é o comportamento esperado: quando o número de processos ultrapassa os núcleos físicos, o custo extra de administrar as threads simultâneas e a disputa pela leitura do disco acabam diminuindo o ganho.
 
-Em resumo, a paralelização se provou muito mais eficiente para essa tarefa do que para algoritmos matemáticos básicos, porque o custo de varrer e extrair dados de cada log compensa todo o trabalho do sistema operacional de criar e organizar múltiplos processos.
 
 ---
 
-## 9. Considerações Finais
+## 9. Conclusão Final e Análise Crítica
 
-O módulo `multiprocessing` demonstrou excelente aderência ao problema de leitura massiva de arquivos de log. A estratégia mais eficiente nos testes usou 12 processos, executando o trabalho **6.44 vezes mais rápido** em comparação à abordagem tradicional (1 processo).
+A experimentação realizada com o módulo `multiprocessing` permitiu validar, de forma prática, os benefícios e as limitações do paralelismo em tarefas de processamento intensivo de dados.
 
-Ao contrário de operações rápidas, a carga computacional alta para fazer parseamento de texto e busca de dicionários justifica perfeitamente o esforço de paralelização, resultando em ganhos diretos e expressivos na agilidade do programa.
+### Principais Constatações:
+1. **Escalabilidade e Desempenho:** O sistema apresentou um ganho de performance expressivo ao transitar da execução sequencial para a paralela. A configuração com 12 processos atingiu a marca de **13.0065 segundos**, representando uma aceleração (**Speedup**) de **6.44x** em relação ao método original.
+   
+2. **Impacto do I/O e CPU:** Diferente de cálculos puramente matemáticos, o processamento de logs envolve uma carga mista de leitura de disco (I/O) e análise de strings (CPU). O paralelismo mostrou-se altamente eficaz aqui porque, enquanto um processo aguarda a leitura de um ficheiro, outros podem continuar a processar dados já carregados na memória.
+
+3. **Ponto de Diminuição de Retorno (Law of Diminishing Returns):** Observou-se que a eficiência caiu de **0.76 (8 processos)** para **0.54 (12 processos)**. Este fenómeno ocorre porque o processador utilizado possui 6 núcleos físicos. Ao utilizar 12 processos (o limite das threads lógicas), o ganho marginal de tempo torna-se menor devido ao *overhead* de gestão do Sistema Operativo e à disputa pelos recursos de hardware (cache e barramento de memória).
+
+### Veredito:
+O uso de múltiplas instâncias de processamento é a estratégia ideal para este cenário. Para volumes de dados na escala de Gigabytes, como o testado (1.37 GB), a abordagem paralela não é apenas uma otimização, mas uma necessidade para garantir a viabilidade temporal da aplicação. O projeto demonstra com sucesso que, ao alinhar a arquitetura do software com as capacidades do hardware moderno, é possível transformar tarefas demoradas em processos de execução quase instantânea.
